@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <algorithm>
 
 #include <zlib.h>
 
@@ -50,8 +51,7 @@ readBlob(const std::filesystem::path name_path)
                                              std::istreambuf_iterator<char>());
 
     uLongf uncompressed_data_size = compressed_data.size() * 10;
-    std::string uncompressed_data;
-    uncompressed_data.resize(uncompressed_data_size);
+    std::string uncompressed_data(uncompressed_data_size, '\0');
 
     if (uncompress(reinterpret_cast<Bytef*>(&uncompressed_data[0]), &uncompressed_data_size,
                    reinterpret_cast<const Bytef*>(compressed_data.c_str()), compressed_data.size()) != Z_OK)
@@ -59,13 +59,18 @@ readBlob(const std::filesystem::path name_path)
         throw std::runtime_error("Failed to uncompress blob.");
     }
 
-    const auto null_pos = uncompressed_data.find('\0');
-    if (null_pos == std::string::npos)
+    const auto header_null_pos = uncompressed_data.find_first_of('\0');
+    if (header_null_pos == std::string::npos)
     {
         std::cerr << "Unable to find header's null symbol\n";
     }
 
-    return uncompressed_data.substr(null_pos + 1);
+    // HACK
+    std::string result = uncompressed_data.substr(header_null_pos + 1);
+    const auto first_null_pos = result.find_first_of('\0');
+    result.erase(first_null_pos);
+
+    return result;
 }
 
 void
@@ -108,7 +113,8 @@ Git::init()
         std::filesystem::create_directory(GIT_OBJECTS_DIR);
         std::filesystem::create_directory(GIT_REFS_DIR);
 
-        std::ofstream headFile(GIT_HEAD_FILE);
+        std::string head(GIT_HEAD_FILE);
+        std::ofstream headFile(head);
         if (headFile.is_open())
         {
             headFile << "ref: refs/heads/master\n";

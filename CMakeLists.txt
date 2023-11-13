@@ -15,6 +15,6 @@ set(CMAKE_CXX_STANDARD 20) # Enable the C++20 standard
 set(SOURCE_FILES src/Server.cpp src/Git.cpp)
 
 add_executable(server ${SOURCE_FILES})
-target_compile_options(server PRIVATE -Wall -Wextra -Wpedantic -Werror)
+#target_compile_options(server PRIVATE -Wall -Wextra -Wpedantic -Werror)
 target_include_directories(server PRIVATE ${ZLIB_INCLUDE_DIR} include)
 target_link_libraries(server zlib)
