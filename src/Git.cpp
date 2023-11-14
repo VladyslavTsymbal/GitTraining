@@ -87,6 +87,7 @@ readBlob(std::istream& input, std::ostream& output)
             {
                 case Z_NEED_DICT:
                     ret = Z_DATA_ERROR;
+                    [[fallthrough]];
                 case Z_DATA_ERROR:
                 case Z_MEM_ERROR:
                     inflateEnd(&strm);
