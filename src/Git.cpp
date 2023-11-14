@@ -5,6 +5,8 @@
 #include <fstream>
 #include <iostream>
 #include <algorithm>
+#include <sstream>
+#include <cassert>
 
 #include <zlib.h>
 
@@ -23,8 +25,7 @@ checkExists(const std::filesystem::path file)
     const auto exists = std::filesystem::exists(file);
     if (not exists)
     {
-        const auto exception_message = file.string() + " not exists.";
-        throw std::runtime_error(exception_message);
+        throw std::runtime_error(file.string() + " not exists.");
     }
 }
 
@@ -37,40 +38,67 @@ checkInitialized()
     checkExists(GIT_HEAD_FILE);
 }
 
-std::string
-readBlob(const std::filesystem::path name_path)
+int
+readBlob(std::istream& input, std::ostream& output)
 {
-    std::ifstream source(name_path, std::ios::binary);
-    if (not source.is_open())
+    constexpr auto CHUNK_SIZE = 16384;
+
+    int ret;
+    unsigned have;
+    z_stream strm;
+    unsigned char in[CHUNK_SIZE];
+    unsigned char out[CHUNK_SIZE];
+
+    strm.zalloc = Z_NULL;
+    strm.zfree = Z_NULL;
+    strm.opaque = Z_NULL;
+    strm.avail_in = 0;
+    strm.next_in = Z_NULL;
+    ret = inflateInit(&strm);
+
+    if (ret != Z_OK)
     {
-        const auto exception_error = std::string("Unable to open file: ") + name_path.string();
-        throw std::runtime_error(exception_error);
+        return ret;
     }
 
-    const auto compressed_data = std::string(std::istreambuf_iterator<char>(source),
-                                             std::istreambuf_iterator<char>());
-
-    uLongf uncompressed_data_size = compressed_data.size() * 10;
-    std::string uncompressed_data(uncompressed_data_size, '\0');
-
-    if (uncompress(reinterpret_cast<Bytef*>(&uncompressed_data[0]), &uncompressed_data_size,
-                   reinterpret_cast<const Bytef*>(compressed_data.c_str()), compressed_data.size()) != Z_OK)
+    do
     {
-        throw std::runtime_error("Failed to uncompress blob.");
-    }
+        if (input.read((char*)in, CHUNK_SIZE))
+        {
+            inflateEnd(&strm);
+            return Z_ERRNO;
+        }
 
-    const auto header_null_pos = uncompressed_data.find_first_of('\0');
-    if (header_null_pos == std::string::npos)
-    {
-        std::cerr << "Unable to find header's null symbol\n";
-    }
+        strm.avail_in = input.gcount();
+        if (strm.avail_in == 0)
+        {
+            break;
+        }
+        strm.next_in = in;
 
-    // HACK
-    std::string result = uncompressed_data.substr(header_null_pos + 1);
-    const auto first_null_pos = result.find_first_of('\0');
-    result.erase(first_null_pos);
+        do
+        {
+            strm.avail_out = CHUNK_SIZE;
+            strm.next_out = out;
+            ret = inflate(&strm, Z_NO_FLUSH);
+            assert(ret != Z_STREAM_ERROR);
 
-    return result;
+            switch (ret)
+            {
+                case Z_NEED_DICT:
+                    ret = Z_DATA_ERROR;
+                case Z_DATA_ERROR:
+                case Z_MEM_ERROR:
+                    inflateEnd(&strm);
+                    return ret;
+            }
+
+            have = CHUNK_SIZE - strm.avail_out;
+            output.write((const char*)out, have);
+        } while (strm.avail_out == 0);
+   } while (ret != Z_STREAM_END);
+
+   return ret == Z_STREAM_END ? Z_OK : Z_DATA_ERROR;
 }
 
 void
@@ -92,7 +120,7 @@ Git::processCommand(const int argc, char** argv)
         {
             throw std::invalid_argument("Invalid use of \'cat-file\'.");
         }
-        catFile(argv[3]);
+        catFile(argv[3], std::cout);
     }
     else
     {
@@ -128,7 +156,7 @@ Git::init()
 }
 
 void
-Git::catFile(const std::string_view hash)
+Git::catFile(const std::string_view hash, std::ostream& output)
 {
     try
     {
@@ -163,16 +191,31 @@ Git::catFile(const std::string_view hash)
         throw std::invalid_argument(exception_message);
     }
 
-    try
+    std::ifstream source(name_path, std::ios::binary);
+    if (not source.is_open())
     {
-        const std::string blob_content = readBlob(name_path);
-        std::cout << blob_content;
+        throw std::runtime_error("Unable to open file: " + name_path.string());
     }
-    catch(const std::exception& e)
+
+    std::stringstream ss;
+    const int ret = readBlob(source, ss);
+    if (ret)
     {
-        const auto exception_message = "Read blob failed.";
-        throw std::runtime_error(exception_message);
+        throw std::runtime_error("Failed to readBlob: " + std::to_string(ret));
     }
+
+    const auto data = ss.str();
+    const std::string_view data_view { data };
+
+    // Find end of header
+    const auto pos = data_view.find_first_of('\0');
+    if (pos == std::string::npos)
+    {
+        throw std::runtime_error("Probably invalid data, zero terminator for header found.");
+    }
+
+    const std::string_view body = data_view.substr(pos);
+    output.write(&body[0], body.size());
 }
 
 } // git

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string_view>
+#include <ostream>
 
 namespace git
 {
@@ -16,7 +17,7 @@ namespace git
             init();
 
             static void
-            catFile(const std::string_view hash);
+            catFile(const std::string_view hash, std::ostream& ouput);
     };
 
 } // git
