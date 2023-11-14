@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.13)
 
-include(FetchDependencies.cmake)
+option(ENABLE_TESTS "Enable GTest tests" OFF)
+
+include(cmake/FetchDependencies.cmake)
 
 project(git-starter-cpp)
 set(CMAKE_CXX_STANDARD 20) # Enable the C++20 standard
