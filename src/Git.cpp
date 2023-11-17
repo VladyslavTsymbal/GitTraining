@@ -13,22 +13,29 @@ int main(int argc, char* argv[])
     }
 
     const std::string_view command { argv[1] };
-    if (command == "init")
+    try
     {
-        git::InitCommand().execute();
-    }
-    else if (command == "cat-file")
-    {
-        if (argc < 4 or std::string_view(argv[2]) not_eq "-p")
+        if (command == "init")
         {
-            std::cerr << "Invalid use of \'cat-file\'.\n";
-            exit(1);
+            git::InitCommand().execute();
         }
-        git::CatFileCommand().execute(argv[3], std::cout);
+        else if (command == "cat-file")
+        {
+            if (argc < 4 or std::string_view(argv[2]) not_eq "-p")
+            {
+                std::cerr << "Invalid use of \'cat-file\'.\n";
+                exit(1);
+            }
+            git::CatFileCommand().execute(argv[3], std::cout);
+        }
+        else
+        {
+            std::cerr << "Unknown git command.\n";
+        }
     }
-    else
+    catch (const std::exception& e)
     {
-        std::cerr << "Unknown git command.\n";
+        std::cerr << e.what() << '\n';
     }
 
     return EXIT_SUCCESS;
