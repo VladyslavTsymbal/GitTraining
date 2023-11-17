@@ -4,16 +4,21 @@
 enable_testing()
 
 set(TEST_DIR ${CMAKE_SOURCE_DIR}/tests)
-set(SOURCES ${TEST_DIR}/ReadBlobTest.cpp)
+# Fix later, no direct source files should be set here
+set(SOURCES ${TEST_DIR}/ReadBlobTest.cpp src/utils/ZlibHelpers.cpp)
 
 add_executable(
   git_test
   ${SOURCES}
 )
 
+target_include_directories(git_test PRIVATE ${GIT_INCLUDES})
+
 target_link_libraries(
   git_test
   GTest::gtest_main
+  # Fix later
+  zlib
 )
 
 include(GoogleTest)
