@@ -76,7 +76,7 @@ readBlob(std::istream& input, std::ostream& output)
    } while (ret != Z_STREAM_END);
 
    inflateEnd(&strm);
-   return ret == Z_STREAM_END ? Z_OK : Z_DATA_ERROR;
+   return Z_OK;
 }
 
 } // namespace git

@@ -17,8 +17,7 @@ TEST(ReadBlob, when_valid_compressed_data_and_hash_passed_then_initial_data_rece
     std::stringstream output_ss;
     if (git::readBlob(input_ss, output_ss))
     {
-        // Investigate ReadBlob return value (should be 0 in success)
-        // EXPECT_TRUE(false);
+        EXPECT_TRUE(false);
     }
 
     const std::string uncompressed_data = output_ss.str();
