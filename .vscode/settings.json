@@ -61,5 +61,7 @@
 		"cinttypes": "cpp",
 		"typeinfo": "cpp",
 		"variant": "cpp"
-	}
+	},
+	"cmake.autoSelectActiveFolder": false,
+	"cmake.sourceDirectory": "${workspaceFolder}/mygit-cli"
 }
