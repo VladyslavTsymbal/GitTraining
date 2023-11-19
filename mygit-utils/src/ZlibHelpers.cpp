@@ -67,6 +67,11 @@ readBlob(std::istream& input, std::ostream& output)
 
             have = CHUNK_SIZE - strm.avail_out;
             output.write((const char*)out, have);
+            if (output.fail())
+            {
+                inflateEnd(&strm);
+                return Z_ERRNO;
+            }
         } while (strm.avail_out == 0);
    } while (ret != Z_STREAM_END);
 
