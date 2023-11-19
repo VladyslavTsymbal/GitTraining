@@ -1,4 +1,4 @@
-#include "utils/ZlibHelpers.hpp"
+#include "ZlibHelpers.hpp"
 
 #include <sstream>
 #include <cassert>

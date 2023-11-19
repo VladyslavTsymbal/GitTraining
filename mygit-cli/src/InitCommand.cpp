@@ -1,5 +1,5 @@
 #include "InitCommand.hpp"
-#include "utils/Helpers.hpp"
+#include "Helpers.hpp"
 #include "CommonVariables.hpp"
 
 #include <fstream>
