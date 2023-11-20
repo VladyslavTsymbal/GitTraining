@@ -9,7 +9,7 @@ namespace git
 struct CatFileCommand
 {
 	void
-	execute(const std::string_view hash, std::ostream& output);
+	execute(std::ostream& output);
 };
 
 } // namespace git

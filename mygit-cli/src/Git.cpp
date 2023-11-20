@@ -4,8 +4,12 @@
 #include "InitCommand.hpp"
 #include "CatFileCommand.hpp"
 
+#include <gflags/gflags.h>
+
 int main(int argc, char* argv[])
 {
+    gflags::ParseCommandLineFlags(&argc, &argv, true);
+
     if (argc < 2)
     {
         std::cerr << "No command provided.\n";
@@ -13,6 +17,7 @@ int main(int argc, char* argv[])
     }
 
     const std::string_view command { argv[1] };
+
     try
     {
         if (command == "init")
@@ -21,12 +26,7 @@ int main(int argc, char* argv[])
         }
         else if (command == "cat-file")
         {
-            if (argc < 4 or std::string_view(argv[2]) not_eq "-p")
-            {
-                std::cerr << "Invalid use of \'cat-file\'.\n";
-                exit(1);
-            }
-            git::CatFileCommand().execute(argv[3], std::cout);
+            git::CatFileCommand().execute(std::cout);
         }
         else
         {

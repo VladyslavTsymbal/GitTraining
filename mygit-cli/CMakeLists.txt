@@ -10,6 +10,13 @@ FetchContent_Declare (
 )
 FetchContent_MakeAvailable (zlib)
 
+FetchContent_Declare (
+    gflags
+    GIT_REPOSITORY https://github.com/gflags/gflags
+    GIT_TAG        v2.2.2
+)
+FetchContent_MakeAvailable (gflags)
+
 option (ENABLE_UTILS_TESTS "Enable MyGit-Utils tests" OFF)
 if (ENABLE_UTILS_TESTS)
     FetchContent_Declare (
@@ -35,4 +42,4 @@ file (GLOB_RECURSE GIT_SRCS src/*.cpp)
 add_executable (mygit_cli ${GIT_SRCS})
 target_include_directories (mygit_cli PRIVATE include)
 target_compile_options (mygit_cli PRIVATE -Wall -Wextra -Wpedantic -Werror)
-target_link_libraries (mygit_cli PRIVATE mygit_utils)
+target_link_libraries (mygit_cli PRIVATE mygit_utils gflags)
