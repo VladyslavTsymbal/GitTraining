@@ -1,7 +1,8 @@
 enable_testing ()
 
 set (TEST_DIR tests)
-set (TEST_SRCS ${TEST_DIR}/ReadBlobTest.cpp)
+set (TEST_SRCS ${TEST_DIR}/ReadBlobTest.cpp
+               ${TEST_DIR}/BlobTest.cpp)
 
 add_executable (
   mygit_utils_test
