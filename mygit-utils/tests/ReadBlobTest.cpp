@@ -9,7 +9,6 @@ TEST(ReadBlob, when_valid_compressed_data_and_hash_passed_then_initial_data_rece
 {
     // SHA1_HASH "358093dba4810321b2080662df818ea5a0ec1ce1"
     const auto compressed_data = "x\x9CK\xCA\xC9OR02d(\xCFH,Q\xC8,V(-\xD0Q\xF0\xAD\xCC\xCEH\xCC\xCC\xC9\xB7\a\x00\x8Bk\t\xA1";
-    const auto expected_uncompressed_data = "what is up, Mykhailo?";
 
     std::stringstream input_ss;
     input_ss << compressed_data;
@@ -27,5 +26,6 @@ TEST(ReadBlob, when_valid_compressed_data_and_hash_passed_then_initial_data_rece
     ASSERT_NE(null_pos, std::string::npos);
 
     const std::string_view body = uncompressed_data_view.substr(null_pos + 1);
-    ASSERT_EQ(body, expected_uncompressed_data);
+    const std::string_view expected_uncompressed_data = "what is up, Mykhailo?";
+    ASSERT_STREQ(body.data(), expected_uncompressed_data.data());
 }
