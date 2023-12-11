@@ -9,11 +9,11 @@
 namespace git
 {
 
+constexpr auto CHUNK_SIZE = 16384;
+
 int
 readBlob(std::istream& input, std::ostream& output)
 {
-    constexpr auto CHUNK_SIZE = 16384;
-
     int ret;
     unsigned have;
     z_stream strm;
@@ -25,8 +25,8 @@ readBlob(std::istream& input, std::ostream& output)
     strm.opaque = Z_NULL;
     strm.avail_in = 0;
     strm.next_in = Z_NULL;
-    ret = inflateInit(&strm);
 
+    ret = inflateInit(&strm);
     if (ret != Z_OK)
     {
         return ret;
@@ -73,10 +73,10 @@ readBlob(std::istream& input, std::ostream& output)
                 return Z_ERRNO;
             }
         } while (strm.avail_out == 0);
-   } while (ret != Z_STREAM_END);
+    } while (ret != Z_STREAM_END);
 
-   inflateEnd(&strm);
-   return Z_OK;
+    inflateEnd(&strm);
+    return Z_OK;
 }
 
 } // namespace git
