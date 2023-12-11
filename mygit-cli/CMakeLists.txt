@@ -17,6 +17,13 @@ FetchContent_Declare (
 )
 FetchContent_MakeAvailable (gflags)
 
+FetchContent_Declare (
+    openssl
+    GIT_REPOSITORY https://github.com/openssl/openssl
+    GIT_TAG        openssl-3.1.3
+)
+FetchContent_MakeAvailable (openssl)
+
 option (ENABLE_UTILS_TESTS "Enable MyGit-Utils tests" OFF)
 if (ENABLE_UTILS_TESTS)
     FetchContent_Declare (
