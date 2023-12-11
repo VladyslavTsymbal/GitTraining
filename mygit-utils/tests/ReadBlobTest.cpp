@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "ZlibHelpers.hpp"
+#include "Crypto.hpp"
 
 #include <sstream>
 #include <string_view>
@@ -55,4 +56,13 @@ TEST(ReadBlob, when_valid_test_blob_file_passed_and_then_initial_data_received)
     const std::string_view body = uncompressed_data_view.substr(null_pos + 1);
     const std::string_view expected_uncompressed_data = "what is up, Mykhailo?";
     ASSERT_STREQ(body.data(), expected_uncompressed_data.data());
+}
+
+TEST(CalculateSHA, when_data_passed_to_calculate_hash_then_expected_hash_returned)
+{
+    const auto expected_sha1_hash = "f3da30b49e07349497a1707f303535fb74d4e070";
+    const auto data = "what is up, Mykhailo?";
+
+    const auto sha1_hash = git::calculateSha1Hash(data);
+    ASSERT_EQ(sha1_hash, expected_sha1_hash);
 }
