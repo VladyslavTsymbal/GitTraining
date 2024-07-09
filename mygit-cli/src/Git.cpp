@@ -1,32 +1,18 @@
+#include "GitCommand.hpp"
+#include "HighLevelCommandFactory.hpp"
+
 #include <iostream>
-#include <string_view>
-
-#include "InitCommand.hpp"
-#include "CatFileCommand.hpp"
-
-#include <gflags/gflags.h>
+#include <memory>
 
 int main(int argc, char* argv[])
 {
-    gflags::ParseCommandLineFlags(&argc, &argv, true);
-
-    if (argc < 2)
-    {
-        std::cerr << "No command provided.\n";
-        exit(1);
-    }
-
-    const std::string_view command { argv[1] };
-
     try
     {
-        if (command == "init")
+        const auto command_ptr = git::HighLevelCommandFactory::getInstance().
+            createCommand(argc, argv);
+        if (command_ptr)
         {
-            git::InitCommand().execute();
-        }
-        else if (command == "cat-file")
-        {
-            git::CatFileCommand().execute(std::cout);
+            command_ptr->execute();
         }
         else
         {

@@ -29,7 +29,7 @@ std::string hexToString(std::string_view data)
 
     if ((data.length() % 2) not_eq 0)
     {
-        throw std::invalid_argument("string is not valid length.");
+        throw std::invalid_argument("hexToString - string is not valid length.");
     }
 
     const auto cnt = data.length() / 2;

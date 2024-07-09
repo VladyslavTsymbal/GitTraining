@@ -11,11 +11,11 @@ FetchContent_Declare (
 FetchContent_MakeAvailable (zlib)
 
 FetchContent_Declare (
-    gflags
-    GIT_REPOSITORY https://github.com/gflags/gflags
-    GIT_TAG        v2.2.2
+    argparse
+    GIT_REPOSITORY https://github.com/p-ranav/argparse
+    GIT_TAG        a2b4d27989177466d4ceceba05e8278f9da498f2
 )
-FetchContent_MakeAvailable (gflags)
+FetchContent_MakeAvailable (argparse)
 
 FetchContent_Declare (
     openssl
@@ -49,4 +49,4 @@ file (GLOB_RECURSE GIT_SRCS src/*.cpp)
 add_executable (mygit_cli ${GIT_SRCS})
 target_include_directories (mygit_cli PRIVATE include)
 target_compile_options (mygit_cli PRIVATE -Wall -Wextra -Wpedantic -Werror)
-target_link_libraries (mygit_cli PRIVATE mygit_utils gflags)
+target_link_libraries (mygit_cli PRIVATE mygit_utils argparse)

@@ -21,7 +21,7 @@ checkExists(const std::filesystem::path file)
     const auto exists = std::filesystem::exists(file);
     if (not exists)
     {
-        throw std::runtime_error(file.string() + " not exists.");
+        throw std::runtime_error("checkExists - " + file.string() + " not exists.");
     }
 }
 

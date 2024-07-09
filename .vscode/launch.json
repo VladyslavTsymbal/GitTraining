@@ -8,9 +8,10 @@
             "name": "C++ Launch (Windows)",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/mygit",
+            "program": "${workspaceFolder}/build/mygit_cli",
             "cwd": "${workspaceFolder}",
-            "args": ["cat-file", "-p", "76997fb16bd78dff64939e90b7a737e965846a33"]
+            "args": ["init"]
+            // "args": ["cat-file", "-p", "76997fb16bd78dff64939e90b7a737e965846a33"]
         }
     ]
 }
