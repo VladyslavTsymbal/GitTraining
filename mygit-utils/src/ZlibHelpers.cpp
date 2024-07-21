@@ -79,4 +79,60 @@ readBlob(std::istream& input, std::ostream& output)
     return Z_OK;
 }
 
+int
+writeBlob(std::istream& input, std::ostream& output, const int compression_level)
+{
+    int ret, flush;
+    unsigned have;
+    z_stream strm;
+    unsigned char in[CHUNK_SIZE];
+    unsigned char out[CHUNK_SIZE];
+
+    strm.zalloc = Z_NULL;
+    strm.zfree = Z_NULL;
+    strm.opaque = Z_NULL;
+
+    ret = deflateInit(&strm, compression_level);
+    if (ret != Z_OK)
+    {
+        return ret;
+    }
+
+    do
+    {
+        if (input.read((char*)in, CHUNK_SIZE))
+        {
+            (void)deflateEnd(&strm);
+            return Z_ERRNO;
+        }
+
+        strm.avail_in = input.gcount();
+        strm.next_in = in;
+        flush = input.eof() ? Z_FINISH : Z_NO_FLUSH;
+
+        do
+        {
+            strm.avail_out = CHUNK_SIZE;
+            strm.next_out = out;
+
+            ret = deflate(&strm, flush);
+            assert(ret != Z_STREAM_ERROR);
+
+            have = CHUNK_SIZE - strm.avail_out;
+            output.write((const char*)out, have);
+            if (output.fail())
+            {
+                (void)deflateEnd(&strm);
+                return Z_ERRNO;
+            }
+        } while (strm.avail_out == 0);
+        assert(strm.avail_in == 0);
+
+    } while (flush != Z_FINISH);
+    assert(ret == Z_STREAM_END);
+
+    (void)deflateEnd(&strm);
+    return Z_OK;
+}
+
 } // namespace git

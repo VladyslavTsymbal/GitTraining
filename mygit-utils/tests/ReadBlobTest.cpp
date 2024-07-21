@@ -66,3 +66,21 @@ TEST(CalculateSHA, when_data_passed_to_calculate_hash_then_expected_hash_returne
     const auto sha1_hash = git::calculateSha1Hash(data);
     ASSERT_EQ(sha1_hash, expected_sha1_hash);
 }
+
+TEST(WriteBlob, when_valid_data_passed_to_writeblob_then_expected_compressed_data_matches_actual)
+{
+    std::stringstream input_ss;
+    input_ss << "blob 21";
+    input_ss << '\0';
+    input_ss << "what is up, Mykhailo?\0";
+
+    std::stringstream output_ss;
+    if (git::writeBlob(input_ss, output_ss, -1))
+    {
+        EXPECT_TRUE(false);
+    }
+
+    const std::string_view expected_compressed_data = "x\x9CK\xCA\xC9OR02d(\xCFH,Q\xC8,V(-\xD0Q\xF0\xAD\xCC\xCEH\xCC\xCC\xC9\xB7\a\x00\x8Bk\t\xA1";
+    const std::string compressed_data = output_ss.str();
+    ASSERT_STREQ(compressed_data.c_str(), expected_compressed_data.data());
+}

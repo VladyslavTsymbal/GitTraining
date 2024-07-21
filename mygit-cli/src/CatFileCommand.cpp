@@ -8,7 +8,6 @@
 #include <fstream>
 #include <stdexcept>
 #include <string_view>
-#include <memory>
 #include <cstring>
 
 #include <argparse/argparse.hpp>
@@ -52,14 +51,7 @@ CatFileCommandFactory catfile_factory;
 void
 CatFileCommand::execute()
 {
-    try
-    {
-        checkInitialized();
-    }
-    catch (const std::exception& e)
-    {
-        throw;
-    }
+    checkInitialized();
 
     if (m_hash.size() not_eq SHA1_STRING_LENGTH)
     {
